@@ -48,21 +48,11 @@ html {
 
 /* Game canvas */
 #gc {
+  color: rgba(240, 247, 21, 0.566);
   border-style: solid;
   background-color: gray;
+  -webkit-box-shadow: 5px 5px 20px 10px rgba(240, 247, 21);
+  box-shadow: 5px 5px 20px 10px rgba(240, 247, 21);
   width: 1280px;
   height: 720px;
-}
-
-.player1 {
-  background-color: green;
-}
-.player2 {
-  background-color: red;
-}
-.middle-box {
-  background-color: black;
-}
-.middle-line .line {
-  color: azure;
 }
