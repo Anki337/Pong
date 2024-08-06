@@ -1,5 +1,6 @@
 body,
 html {
+  background-color: rgb(0, 0, 0);
   margin: 0;
   padding: 0;
   height: 100%;
@@ -9,33 +10,34 @@ html {
   width: 100%;
   align-items: center;
   justify-content: space-around;
-  background-color: yellow;
+  background-color: rgb(170, 134, 134);
   box-sizing: border-box;
 }
 /* Style the header links */
 .header a {
-  color: black;
+  color: rgb(0, 0, 0);
   text-decoration: none;
-  font-size: 12px;
-  padding: 10px 10px;
+  font-size: 22px;
+  padding: 5px 5px;
 }
 /* Change the background color on mouse-over */
 .header a:hover {
-  background-color: gray;
+  background-color: rgb(15, 15, 15);
   border-radius: 50%;
-  color: azure;
-  -webkit-box-shadow: 5px 5px 20px 10px gray;
-  box-shadow: 5px 5px 20px 10px gray;
+  color: rgba(240, 247, 21);
+  -webkit-box-shadow: 5px 5px 20px 10px rgb(15, 15, 15);
+  box-shadow: 5px 5px 20px 10px rgb(15, 15, 15);
 }
 .header > h5 {
+  font-size: 26px;
   font-family: "Courier New", Courier, monospace;
 }
 .header > h5:hover {
-  color: azure;
-  background-color: gray;
+  color: rgba(240, 247, 21);
+  background-color: rgb(15, 15, 15);
   border-radius: 50%;
-  -webkit-box-shadow: 5px 5px 20px 10px gray;
-  box-shadow: 5px 5px 20px 10px gray;
+  -webkit-box-shadow: 5px 5px 20px 10px rgb(15, 15, 15);
+  box-shadow: 5px 5px 20px 10px rgb(15, 15, 15);
 }
 /* Div holding the Canvas */
 .canvas-holder {
@@ -45,11 +47,11 @@ html {
 }
 
 /* Game canvas */
-#game-field {
+#gc {
   border-style: solid;
   background-color: gray;
-  min-height: 250px;
-  min-width: 500px;
+  width: 1280px;
+  height: 720px;
 }
 
 .player1 {
