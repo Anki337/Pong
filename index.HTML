@@ -1,14 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
     <title>Pong</title>
-</head>
-<body>
-    <h1>Welcome to Pong!</h1>
+  </head>
+  <body>
+    <div class="header">
+      <h5>Welcome to Pong!</h5>
+      <a href="#home">Home</a>
+      <a href="#contact">Contact</a>
+      <a href="#about">About</a>
+    </div>
+    <div class="canvas-holder">
+      <canvas id="game-field">
+        <div class="player1">player1</div>
+        <div class="middle-box">=========</div>
+        <div class="player2">player2</div>
+      </canvas>
+    </div>
 
     <script src="main.JS"></script>
-</body>
+  </body>
 </html>
