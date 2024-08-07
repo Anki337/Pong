@@ -43,7 +43,7 @@ html {
 .canvas-holder {
   display: flex;
   justify-content: center;
-  padding: 50px 50px 50px 50px;
+  padding: 50px 85px 50px;
 }
 
 /* Game canvas */
