@@ -20,6 +20,11 @@ game_plan.addEventListener("mousemove", function (e) {
 // Set global animationid variable:
 let animationid;
 
+// Hit-counter to keep track of hits to increase game speed.
+let hit_counter = 0;
+// Power_up-counter to keep track of power-ups stages and effects.
+let power_up = 0;
+
 // Set paddle positions:
 let player_paddle_y = 40;
 let computer_paddle_y = 40;
@@ -36,10 +41,10 @@ let ball_y = 50;
 let ball_size = 20;
 
 //set speed variables:
-const baseline_speed = 2;
+let baseline_speed = 2;
 let x_velocity = baseline_speed;
 let y_velocity = x_velocity;
-let computer_speed = 2;
+let computer_speed = 3;
 
 // make variables to hold player & computer scores:
 let player1_score = 0;
@@ -56,6 +61,9 @@ function reset_ball() {
   ball_y = game_plan.height / 2;
   x_velocity = baseline_speed * (Math.random() > 0.5 ? 1 : -1);
   y_velocity = baseline_speed * (Math.random() > 0.5 ? 1 : -1);
+  baseline_speed = 2;
+  hit_counter = 0;
+  console.log(hit_counter);
 }
 // Bounce_ball()
 function bounce_ball() {
@@ -65,12 +73,12 @@ function bounce_ball() {
   // Bounce ball off the top of the screen:
   if (next_ball_y - ball_size / 2 <= 0 && y_velocity < 0) {
     y_velocity = -y_velocity;
-    next_ball_y = ball_size / 2; // Adjust to prevent clipping
+    next_ball_y = ball_size / 2; // Adjustment to prevent clipping
   }
   // Bounce ball off the bottom of the screen:
   if (next_ball_y + ball_size / 2 >= game_plan.height && y_velocity > 0) {
     y_velocity = -y_velocity;
-    next_ball_y = game_plan.height - ball_size / 2; // Adjust to prevent clipping
+    next_ball_y = game_plan.height - ball_size / 2; // Adjustment to prevent clipping
   }
   // Check collision with the left side (player paddle):
   if (next_ball_x - ball_size / 2 <= paddle_thickness) {
@@ -79,8 +87,9 @@ function bounce_ball() {
       next_ball_y <= player_paddle_y + paddle_height
     ) {
       x_velocity = -x_velocity;
-      next_ball_x = paddle_thickness + ball_size / 2; // Adjust to prevent clipping
-      console.log(x_velocity, y_velocity);
+      next_ball_x = paddle_thickness + ball_size / 2; // Adjustment to prevent clipping
+      ++hit_counter;
+      console.log(hit_counter);
     } else {
       computer_score++;
       reset_ball();
@@ -94,7 +103,9 @@ function bounce_ball() {
       next_ball_y <= computer_paddle_y + paddle_height
     ) {
       x_velocity = -x_velocity;
-      next_ball_x = game_plan.width - paddle_thickness - ball_size / 2; // Adjust to prevent clipping
+      next_ball_x = game_plan.width - paddle_thickness - ball_size / 2; // Adjustment to prevent clipping
+      ++hit_counter;
+      console.log(hit_counter);
     } else {
       player1_score++;
       reset_ball();
@@ -116,6 +127,8 @@ function move_ball() {
   );
   // Call the bounce_ball function with ball collision logic from here keeping it in one place.
   bounce_ball();
+  // Increase the speed of game after 5 consecutive hits with paddels.
+  increment_speed();
   // Re-draw the projectile
   context.fillRect(
     ball_x - ball_size / 2,
@@ -124,6 +137,22 @@ function move_ball() {
     ball_size
   );
 }
+// Increment_speed()   // Only works after the first reset_ball call.
+function increment_speed() {
+  if (hit_counter == 5 && power_up == 0) {
+    baseline_speed += 1;
+    computer_speed += 1;
+    console.log(
+      "Speed Incremented by: 1 and is now at: ",
+      baseline_speed,
+      "Because you made: ",
+      hit_counter,
+      "consecutive hits!"
+    );
+    hit_counter = 0;
+  }
+}
+
 // Computer_paddle()
 function computer_paddle() {
   // Decide the color
