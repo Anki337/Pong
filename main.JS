@@ -7,8 +7,9 @@
 const game_plan = document.getElementById("gp");
 // Get the context variable to draw the elements on the canvas:
 const context = game_plan.getContext("2d");
-// Create a function that listens for mouseover on the canvas:
+// Global mouse variable.
 let mouseY;
+// Create a function that listens for mouseover on the canvas:
 game_plan.addEventListener("mousemove", function (e) {
   // Get a boundary for the rect around the canvas so it doesn't escape the game_plan:
   const rect = game_plan.getBoundingClientRect();
@@ -18,9 +19,12 @@ game_plan.addEventListener("mousemove", function (e) {
 
 // Set global animationid variable:
 let animationid;
+
+// Game speed multiplier:
+let game_speed_increase = 0;
 // Set paddle positions:
-let paddle1_y = 40;
-let paddle2_y = 40;
+let player_paddle_y = 40;
+let computer_paddle_y = 40;
 
 // Set paddle sizes on screen:
 let paddle_thickness = 10;
@@ -34,16 +38,17 @@ let ball_y = 50;
 let ball_size = 20;
 
 //set speed variables:
-let x_velocity = 4;
-let y_velocity = x_velocity;
-let computer_speed = 3;
+let baseline_speed = 2;
+let x_velocity = baseline_speed;
+let y_velocity = baseline_speed;
+let computer_speed = 2;
 
 // make variables to hold player & computer scores:
 let player1_score = 0;
 let computer_score = 0;
 
 // Set a win or loose criteria and a reset game bool for handling wins and replays:
-const winning_score = 2;
+const winning_score = 2000;
 let game_over = false;
 
 // Reset_ball()
@@ -51,104 +56,134 @@ function reset_ball() {
   //Reset ball position after scoring:
   ball_x = game_plan.width / 2;
   ball_y = game_plan.height / 2;
-  x_velocity = -x_velocity;
-  y_velocity = 5;
-}
-// Move_ball()
-function move_ball() {
-  ball_x += x_velocity;
-  ball_y += y_velocity;
-}
-// Computer_paddle()
-function computer_paddle() {
-  //Move ai paddle up or down based on the "y" value of the ball.
-  if (paddle2_y + paddle_height / 2 < ball_y) {
-    paddle2_y += computer_speed;
-  } else {
-    paddle2_y -= computer_speed;
-  }
-}
-function updatePaddle1Position() {
-  // Update the paddle position:
-  paddle1_y = Math.max(
-    0,
-    Math.min(game_plan.height - paddle_height, mouseY - paddle_height / 2)
-  );
+  console.log("Ball speed: ", x_velocity, y_velocity);
+  x_velocity = baseline_speed * (Math.random() > 0.5 ? 1 : -1); // Why is it always 2 -2 or -2 2 . Should it be random?
+  y_velocity = baseline_speed * (Math.random() > 0.5 ? 1 : -1);
+  console.log("gamespeed increase before reset: ", game_speed_increase);
+  game_speed_increase = 0;
 }
 // Bounce_ball()
 function bounce_ball() {
-  // Bounce ball of top of the screen:
-  if (ball_y < 0 && y_velocity < 0) {
+  // Calculate next position of the ball
+  let next_ball_x = ball_x + x_velocity + game_speed_increase;
+  let next_ball_y = ball_y + y_velocity + game_speed_increase;
+
+  // Bounce ball off the top of the screen:
+  if (next_ball_y - ball_size / 2 <= 0 && y_velocity < 0) {
     y_velocity = -y_velocity;
+    next_ball_y = ball_size / 2; // Adjust to prevent clipping
   }
-  // Bounce ball of bottom of the screen:
-  if (ball_y > game_plan.height && y_velocity > 0) {
+
+  // Bounce ball off the bottom of the screen:
+  if (next_ball_y + ball_size / 2 >= game_plan.height && y_velocity > 0) {
     y_velocity = -y_velocity;
+    next_ball_y = game_plan.height - ball_size / 2; // Adjust to prevent clipping
   }
-  // Bounce ball of the left side (where) there is a paddle:
-  if (ball_x < 0) {
-    // if a ball is smaller than 0, meaning on the left side and its Y coordinate is smaller than paddle1 "Y" pos + it's height, it's a collision.
-    if (ball_y > 0 && ball_y < paddle1_y + paddle_height) {
-      // Reverse the Y vector of the ball since it has hit a paddle and stopped.
+
+  // Check collision with the left side (player paddle):
+  if (next_ball_x - ball_size / 2 <= paddle_thickness) {
+    if (
+      next_ball_y >= player_paddle_y &&
+      next_ball_y <= player_paddle_y + paddle_height
+    ) {
       x_velocity = -x_velocity;
-      // Has the ball hit (upper - middle - bottom) of the paddle? positive value delta_y = top, 0 = middle, negative delta_y value = bottom.
-      delta_y = ball_y - (paddle1_y + paddle_height / 2);
-      // Slightly change the direction of the ball.
-      y_velocity = delta_y * Math.random();
+      next_ball_x = paddle_thickness + ball_size / 2; // Adjust to prevent clipping
     } else {
       computer_score++;
       reset_ball();
+      return; // Ensure we exit early after resetting the ball
     }
   }
-  // Bounce the ball of the right side (where) there is a paddle:
-  if (ball_x > game_plan.width) {
-    if (ball_y > paddle2_y && ball_y < paddle2_y + paddle_height) {
-      // Stop and change x direction <-- since its a hit.
+
+  // Check collision with the right side (computer paddle):
+  if (next_ball_x + ball_size / 2 >= game_plan.width - paddle_thickness) {
+    if (
+      next_ball_y >= computer_paddle_y &&
+      next_ball_y <= computer_paddle_y + paddle_height
+    ) {
       x_velocity = -x_velocity;
-      // Has the ball hit (upper - middle - bottom) of the paddle? positive value delta_y = top, 0 = middle, negative delta_y value = bottom.
-      delta_y = ball_y - (paddle1_y + paddle_height / 2);
-      // Slightly change the direction of the ball.
-      y_velocity = delta_y * Math.random();
+      next_ball_x = game_plan.width - paddle_thickness - ball_size / 2; // Adjust to prevent clipping
     } else {
       player1_score++;
       reset_ball();
+      return; // Ensure we exit early after resetting the ball
     }
   }
+
+  // Update ball position with corrected next positions
+  ball_x = next_ball_x;
+  ball_y = next_ball_y;
 }
-
-// Rendering the game:
-function setup_gameplan() {
-  //fill in the canvas with objects
-  // Set canvas background:
-  const my_background = new Image();
-  my_background.src = "./Images/Pong.jpg";
-
-  my_background.onload = () => {
-    context.drawImage(my_background, 0, 0);
-  };
-
-  // Add the paddles' color
-  context.fillStyle = "yellow";
-
-  // Add paddle 1
-  context.fillRect(0, paddle1_y, paddle_thickness, paddle_height);
-
-  // Add paddle 2
-  context.fillRect(
-    game_plan.width - paddle_thickness,
-    paddle2_y,
-    paddle_thickness,
-    paddle_height
+// Move_ball()
+function move_ball() {
+  // Clear previous projectile
+  context.clearRect(
+    ball_x - ball_size / 2 - Math.abs(x_velocity),
+    ball_y - ball_size / 2 - Math.abs(y_velocity),
+    ball_size + Math.abs(x_velocity) * 2,
+    ball_size + Math.abs(x_velocity) * 2
   );
-
-  // Draw the ball
+  // Call the bounce_ball function with ball collision logic from here keeping it in one place.
+  bounce_ball();
+  // Re-draw the projectile
   context.fillRect(
     ball_x - ball_size / 2,
     ball_y - ball_size / 2,
     ball_size,
     ball_size
   );
+}
+// Computer_paddle()
+function computer_paddle() {
+  // Decide the color
+  context.fillStyle = "rgba(240, 247, 21)";
+  // Clear the previous rect for smooth movement
+  context.clearRect(
+    game_plan.width - paddle_thickness,
+    computer_paddle_y,
+    paddle_thickness,
+    paddle_height
+  );
+  //Move ai paddle up or down based on the "y" value of the ball.
+  if (computer_paddle_y + paddle_height / 2 < ball_y) {
+    computer_paddle_y += computer_speed + game_speed_increase;
+  } else {
+    computer_paddle_y -= computer_speed + game_speed_increase;
+  }
+  // Re-draw it after each If-check to make it look smooth.
+  context.fillRect(
+    game_plan.width - paddle_thickness,
+    computer_paddle_y,
+    paddle_thickness,
+    paddle_height
+  );
+}
 
+// Function to update the pos of player paddle.
+function player_paddle() {
+  // clear it before update:
+  context.clearRect(0, player_paddle_y, paddle_thickness, paddle_height);
+  // Update the paddle position:
+  player_paddle_y = Math.max(
+    0,
+    Math.min(game_plan.height - paddle_height, mouseY - paddle_height / 2)
+  );
+  // Re-Draw the paddle1_y
+  context.fillRect(0, player_paddle_y, paddle_thickness, paddle_height);
+}
+
+// Rendering the game:
+function setup_gameplan() {
+  //fill in the canvas with objects
+  // Set canvas background:
+  // const my_background = new Image();
+  // my_background.src = "./Images/Pong.jpg";
+
+  // my_background.onload = () => {
+  //   context.drawImage(my_background, 0, 0);
+  // };
+  // Set text color
+  context.fillStyle = "rgba(240, 247, 21)";
   // Add Score board boxes
   context.fillRect(90, game_plan.height - 95, 40, 40);
   context.fillRect(game_plan.width - 110, 65, 40, 40);
@@ -163,15 +198,13 @@ function setup_gameplan() {
   context.fillText(computer_score, game_plan.width - 107, 100);
 }
 
+// End-Screen.
 function winner() {
   if (player1_score == winning_score || computer_score == winning_score) {
     game_over = true;
-
     cancelAnimationFrame(animationid);
 
-    context.clearRect(0, 0, game_plan.width, game_plan.height);
-
-    context.fillStyle = "Green";
+    context.fillStyle = "rgba(240, 247, 21)";
     context.font = "48px serif";
     context.fillText(
       "End of Game",
@@ -200,11 +233,16 @@ function winner() {
 function gameloop() {
   if (!game_over) {
     setup_gameplan();
-    move_ball();
-    updatePaddle1Position();
     computer_paddle();
-    bounce_ball();
+    player_paddle();
+    move_ball();
     winner();
+
+    // Increace the game speed and reset_ball() resets it to 0 each time someone scores.
+    if (game_speed_increase < 5) {
+      game_speed_increase += 0.00005;
+    }
+
     animationid = requestAnimationFrame(gameloop);
   }
 }
