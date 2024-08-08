@@ -20,8 +20,6 @@ game_plan.addEventListener("mousemove", function (e) {
 // Set global animationid variable:
 let animationid;
 
-// Game speed multiplier:
-let game_speed_increase = 0;
 // Set paddle positions:
 let player_paddle_y = 40;
 let computer_paddle_y = 40;
@@ -38,9 +36,9 @@ let ball_y = 50;
 let ball_size = 20;
 
 //set speed variables:
-let baseline_speed = 2;
+const baseline_speed = 2;
 let x_velocity = baseline_speed;
-let y_velocity = baseline_speed;
+let y_velocity = x_velocity;
 let computer_speed = 2;
 
 // make variables to hold player & computer scores:
@@ -56,30 +54,24 @@ function reset_ball() {
   //Reset ball position after scoring:
   ball_x = game_plan.width / 2;
   ball_y = game_plan.height / 2;
-  console.log("Ball speed: ", x_velocity, y_velocity);
-  x_velocity = baseline_speed * (Math.random() > 0.5 ? 1 : -1); // Why is it always 2 -2 or -2 2 . Should it be random?
+  x_velocity = baseline_speed * (Math.random() > 0.5 ? 1 : -1);
   y_velocity = baseline_speed * (Math.random() > 0.5 ? 1 : -1);
-  console.log("gamespeed increase before reset: ", game_speed_increase);
-  game_speed_increase = 0;
 }
 // Bounce_ball()
 function bounce_ball() {
   // Calculate next position of the ball
-  let next_ball_x = ball_x + x_velocity + game_speed_increase;
-  let next_ball_y = ball_y + y_velocity + game_speed_increase;
-
+  let next_ball_x = ball_x + x_velocity;
+  let next_ball_y = ball_y + y_velocity;
   // Bounce ball off the top of the screen:
   if (next_ball_y - ball_size / 2 <= 0 && y_velocity < 0) {
     y_velocity = -y_velocity;
     next_ball_y = ball_size / 2; // Adjust to prevent clipping
   }
-
   // Bounce ball off the bottom of the screen:
   if (next_ball_y + ball_size / 2 >= game_plan.height && y_velocity > 0) {
     y_velocity = -y_velocity;
     next_ball_y = game_plan.height - ball_size / 2; // Adjust to prevent clipping
   }
-
   // Check collision with the left side (player paddle):
   if (next_ball_x - ball_size / 2 <= paddle_thickness) {
     if (
@@ -88,13 +80,13 @@ function bounce_ball() {
     ) {
       x_velocity = -x_velocity;
       next_ball_x = paddle_thickness + ball_size / 2; // Adjust to prevent clipping
+      console.log(x_velocity, y_velocity);
     } else {
       computer_score++;
       reset_ball();
       return; // Ensure we exit early after resetting the ball
     }
   }
-
   // Check collision with the right side (computer paddle):
   if (next_ball_x + ball_size / 2 >= game_plan.width - paddle_thickness) {
     if (
@@ -109,7 +101,6 @@ function bounce_ball() {
       return; // Ensure we exit early after resetting the ball
     }
   }
-
   // Update ball position with corrected next positions
   ball_x = next_ball_x;
   ball_y = next_ball_y;
@@ -146,9 +137,9 @@ function computer_paddle() {
   );
   //Move ai paddle up or down based on the "y" value of the ball.
   if (computer_paddle_y + paddle_height / 2 < ball_y) {
-    computer_paddle_y += computer_speed + game_speed_increase;
+    computer_paddle_y += computer_speed;
   } else {
-    computer_paddle_y -= computer_speed + game_speed_increase;
+    computer_paddle_y -= computer_speed;
   }
   // Re-draw it after each If-check to make it look smooth.
   context.fillRect(
@@ -174,14 +165,14 @@ function player_paddle() {
 
 // Rendering the game:
 function setup_gameplan() {
-  //fill in the canvas with objects
-  // Set canvas background:
-  // const my_background = new Image();
-  // my_background.src = "./Images/Pong.jpg";
+  //Set canvas background:
+  const my_background = new Image();
+  my_background.src = "./Images/Pong.jpg";
 
-  // my_background.onload = () => {
-  //   context.drawImage(my_background, 0, 0);
-  // };
+  my_background.onload = () => {
+    context.drawImage(my_background, 0, 0);
+  };
+
   // Set text color
   context.fillStyle = "rgba(240, 247, 21)";
   // Add Score board boxes
@@ -237,11 +228,6 @@ function gameloop() {
     player_paddle();
     move_ball();
     winner();
-
-    // Increace the game speed and reset_ball() resets it to 0 each time someone scores.
-    if (game_speed_increase < 5) {
-      game_speed_increase += 0.00005;
-    }
 
     animationid = requestAnimationFrame(gameloop);
   }
