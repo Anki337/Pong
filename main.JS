@@ -50,14 +50,14 @@ let ball_size = 20;
 let baseline_speed = 2;
 let x_velocity = baseline_speed;
 let y_velocity = x_velocity;
-let computer_speed = 2;
+let computer_speed = 1.815;
 
 // make variables to hold player & computer scores:
 let player1_score = 0;
 let computer_score = 0;
 
 // Set a win or loose criteria and a reset game bool for handling wins and replays:
-const winning_score = 2000;
+const winning_score = 5;
 let game_over = false;
 
 // Set up background:
@@ -70,24 +70,44 @@ function setBackground() {
   };
 }
 
-// Array of power_up Rects that will interact with the ball if hit
+// Array of power_up Rects that will interact with the ball if hit x10.
 const power_up_arr = [
-  { width: ball_size, height: ball_size, isActive: true },
-  { width: ball_size, height: ball_size, isActive: true },
-  { width: ball_size, height: ball_size, isActive: true },
-  { width: ball_size, height: ball_size, isActive: true },
-  { width: ball_size, height: ball_size, isActive: true },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
+  { width: ball_size, height: ball_size, isActive: false },
 ];
 
 // Make the ball round:
 function drawBall(x, y, radius) {
   context.beginPath(); // Start a new path (to avoid connecting with other drawings)
   context.arc(x, y, radius, 0, Math.PI * 2); // Draw the circle using arc method
-  context.fillStyle = "rgba(240, 247, 21)";
+  context.fillStyle = "rgba(167, 2, 152, 1)";
   context.fill(); // Fill the circle with the specified color
   context.closePath(); // Close the path
 }
-// Clear a round area instead of square.
+// Clear a round area instead of square, via saving context , removing and restoring from the save.
 function clearBall(x, y, radius) {
   // Save the current context state
   context.save();
@@ -111,11 +131,11 @@ function resetBall() {
   baseline_speed = 2;
   power_up = 0;
   hit_counter = 0;
-  computer_speed = 2;
+  computer_speed = 1.815;
   crazy_mode = false;
   x_velocity = baseline_speed * (Math.random() > 0.5 ? 1 : -1);
   y_velocity = baseline_speed * (Math.random() > 0.5 ? 1 : -1);
-  console.log(hit_counter);
+  console.log("Hit Counter reset to ", hit_counter);
 }
 // Bounce_ball()
 function bounceBall() {
@@ -183,7 +203,6 @@ function moveBall() {
 function incrementSpeed() {
   if (hit_counter == 2 && power_up == 0) {
     x_velocity += x_velocity > 0 ? 1 : -1;
-    computer_speed += 0.5;
     console.log(
       "Speed Incremented by: 1 and is now at: ",
       x_velocity,
@@ -191,15 +210,13 @@ function incrementSpeed() {
       hit_counter,
       "consecutive hits!",
       "Power up is at level: ",
-      power_up,
-      "Computer speed power up by: ",
-      computer_speed
+      power_up
     );
-    power_up = 1;
+    power_up++;
   }
   if (hit_counter == 5 && power_up == 1) {
     x_velocity += x_velocity > 0 ? 1 : -1;
-    computer_speed += 0.5;
+    computer_speed += 0.050;
     console.log(
       "Speed Incremented by: 1 and is now at: ",
       x_velocity,
@@ -207,15 +224,12 @@ function incrementSpeed() {
       hit_counter,
       "consecutive hits!",
       "Power up is at level: ",
-      power_up,
-      "Computer speed power up by: ",
-      computer_speed
+      power_up
     );
-    power_up = 2;
+    power_up++;
   }
   if (hit_counter == 7 && power_up == 2) {
     x_velocity += x_velocity > 0 ? 1 : -1;
-    computer_speed += 0.5;
     console.log(
       "Speed Incremented by: 1 and is now at: ",
       x_velocity,
@@ -223,15 +237,12 @@ function incrementSpeed() {
       hit_counter,
       "consecutive hits!",
       "Power up is at level: ",
-      power_up,
-      "Computer speed power up by: ",
-      computer_speed
+      power_up
     );
-    power_up = 3;
+    power_up++;
   }
   if (hit_counter == 9 && power_up == 3) {
     x_velocity += x_velocity > 0 ? 1 : -1;
-    computer_speed += 0.5;
     console.log(
       "Speed Incremented by: 1 and is now at: ",
       x_velocity,
@@ -239,11 +250,9 @@ function incrementSpeed() {
       hit_counter,
       "consecutive hits!",
       "Power up is at level: ",
-      power_up,
-      "Computer speed is now: ",
-      computer_speed
+      power_up
     );
-    power_up = 4;
+    power_up++;
   }
   if (hit_counter == 11 && power_up == 4) {
     x_velocity += x_velocity > 0 ? 1 : -1;
@@ -259,7 +268,12 @@ function incrementSpeed() {
       "Computer speed power up by: ",
       computer_speed
     );
-    power_up = 5;
+    power_up++;
+  }
+  if (hit_counter == 20 && power_up == 5) {
+    x_velocity += x_velocity > 0 ? 4 : -4;
+    computer_speed += computer_speed + 1;
+    power_up++;
   }
 }
 // Function to get a random position within the constraints
@@ -280,23 +294,22 @@ function getRandomPosition(rectWidth, rectHeight) {
 }
 // Spawns yellow rects from an array in a for loop with length of power_up_arr, starting with same rect as ball to begin with.
 function spawnPowerUps(power_up_arr) {
-  if (power_up == 5 && crazy_mode == false) {
-    // Loop to add power-ups with a delay
-    for (let i = 0; i < power_up_arr.length; i++) {
-      setTimeout(() => {
-        const position = getRandomPosition(
-          power_up_arr[i].width,
-          power_up_arr[i].height
-        );
-        power_up_arr[i].x = position.x;
-        power_up_arr[i].y = position.y;
-        console.log("Power-up spawned at:", position);
-      }, i * 2000); // 2 seconds delay between spawning each power-up
+  if (!game_over) {
+    if (power_up === 5 && crazy_mode == false) {
+      power_up_arr.forEach((power_up, i) => {
+        setTimeout(() => {
+          const position = getRandomPosition(power_up.width, power_up.height);
+          power_up.x = position.x;
+          power_up.y = position.y;
+          power_up.isActive = true; // Activate power-up
+          console.log("Power-up spawned at:", position);
+        }, i * 2000); // 2 seconds delay between spawning each power-up
+      });
+      crazy_mode = true;
     }
-    crazy_mode = true;
   }
 }
-function drawPowerUps() {
+function drawPowerUps(power_up_arr) {
   power_up_arr.forEach((power_up) => {
     if (power_up.isActive) {
       context.fillStyle = "green";
@@ -304,8 +317,8 @@ function drawPowerUps() {
     }
   });
 }
-// Checking for powerUp Collision and changing velocity by delta * 0.3
-function checkPowerUpCollision() {
+// Checking for powerUp Collision and changing by delta * 0.3
+function checkPowerUpCollision(power_up_arr) {
   power_up_arr.forEach((power_up) => {
     if (power_up.isActive) {
       const distance = Math.sqrt(
@@ -314,8 +327,8 @@ function checkPowerUpCollision() {
       if (distance < ball_size / 2 + power_up.width / 2) {
         // Handle power-up collision
         power_up.isActive = false; // Deactivate power-up
-        x_velocity = -x_velocity; // Example: Change direction
-        console.log("Power-up collected at:", power_up.x, power_up.y);
+        // Change ball velocity
+        x_velocity = -x_velocity;
       }
     }
   });
@@ -323,7 +336,7 @@ function checkPowerUpCollision() {
 // Computer_paddle()
 function computerPaddle() {
   // Decide the color
-  context.fillStyle = "rgba(240, 247, 21)";
+  context.fillStyle = "rgba(235, 62, 62, 1)";
   // Clear the previous rect for smooth movement
   context.clearRect(
     game_plan.width - paddle_thickness,
@@ -356,6 +369,7 @@ function playerPaddle() {
     Math.min(game_plan.height - paddle_height, mouseY - paddle_height / 2)
   );
   // Re-Draw the paddle1_y
+  context.fillStyle = "rgba(70, 230, 88, 1)";
   context.fillRect(0, player_paddle_y, paddle_thickness, paddle_height);
 }
 
@@ -366,6 +380,9 @@ function setupGamefield() {
   // Add Score board boxes
   context.fillRect(90, game_plan.height - 95, 40, 40);
   context.fillRect(game_plan.width - 110, 65, 40, 40);
+
+  // Add the middle line
+  context.fillRect(game_plan.width / 2, -1, 2, game_plan.height + 1);
 
   // Add the score text
   context.font = "18px serif";
@@ -381,20 +398,18 @@ function setupGamefield() {
 function winnerScreen() {
   if (player1_score == winning_score || computer_score == winning_score) {
     game_over = true;
-    cancelAnimationFrame(animationid);
-
     context.fillStyle = "rgba(240, 247, 21)";
     context.font = "48px serif";
     context.fillText(
       "End of Game",
-      game_plan.width / 2 - game_plan.width / 6,
+      game_plan.width / 2 - game_plan.width / 9,
       game_plan.height / 2
     );
     if (player1_score === winning_score) {
       context.font = "24px serif";
       context.fillText(
         "You won!",
-        game_plan.width / 2 - game_plan.width / 14,
+        game_plan.width / 2 - game_plan.width / 16,
         game_plan.height / 2 + 25
       );
     }
@@ -402,10 +417,11 @@ function winnerScreen() {
       context.font = "24px serif";
       context.fillText(
         "The AI won!",
-        game_plan.width / 2 - game_plan.width / 14,
+        game_plan.width / 2 - game_plan.width / 16,
         game_plan.height / 2 + 25
       );
     }
+    cancelAnimationFrame(animationid);
   }
 }
 // Setup the gameloop:
@@ -414,14 +430,15 @@ function gameloop() {
     setBackground();
     setupGamefield();
     spawnPowerUps(power_up_arr);
-    drawPowerUps();
+    drawPowerUps(power_up_arr);
+    checkPowerUpCollision(power_up_arr);
     computerPaddle();
     playerPaddle();
     moveBall();
-    checkPowerUpCollision();
     winnerScreen();
-
     animationid = requestAnimationFrame(gameloop);
+  } else {
+    winnerScreen();
   }
 }
 // Run the game.
