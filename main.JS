@@ -1,9 +1,6 @@
 /* Pong Game Logic */
 
-// Global variables:
-
 // Canvas id=gp eventlistener:
-// Get the canvas:
 const game_plan = document.getElementById("gp");
 // Get the context variable to draw the elements on the canvas:
 const context = game_plan.getContext("2d");
@@ -17,49 +14,40 @@ game_plan.addEventListener("mousemove", function (e) {
   mouseY = e.clientY - rect.top;
 });
 
+// Global variables //
 // Set global animationid variable:
 let animationid;
-
 // Hit-counter to keep track of hits to increase game speed.
 let hit_counter = 0;
 // Power_up-counter to keep track of power-ups stages and effects.
 let power_up = 0;
 // Crazy_mode switch:
 let crazy_mode = false;
-
 // Crazy mode power ups window of placement:
 const canvasWidth = game_plan.width;
 const canvasHeight = game_plan.height;
-
 // Set paddle positions:
 let player_paddle_y = 40;
 let computer_paddle_y = 40;
-
 // Set paddle sizes on screen:
 let paddle_thickness = 10;
 let paddle_height = 100;
-
 // set the ball position:
 let ball_x = 50;
 let ball_y = 50;
-
 // set the ball dimension:
 let ball_size = 20;
-
 //set speed variables:
 let baseline_speed = 2;
 let x_velocity = baseline_speed;
 let y_velocity = x_velocity;
 let computer_speed = 1.815;
-
 // make variables to hold player & computer scores:
 let player1_score = 0;
 let computer_score = 0;
-
 // Set a win or loose criteria and a reset game bool for handling wins and replays:
 const winning_score = 5;
 let game_over = false;
-
 // Set up background:
 function setBackground() {
   const my_background = new Image();
@@ -69,7 +57,6 @@ function setBackground() {
     context.drawImage(my_background, 0, 0);
   };
 }
-
 // Array of power_up Rects that will interact with the ball if hit x10.
 const power_up_arr = [
   { width: ball_size, height: ball_size, isActive: false },
@@ -98,12 +85,11 @@ const power_up_arr = [
   { width: ball_size, height: ball_size, isActive: false },
   { width: ball_size, height: ball_size, isActive: false },
 ];
-
 // Make the ball round:
-function drawBall(x, y, radius) {
+function drawBall(x, y, radius, color) {
   context.beginPath(); // Start a new path (to avoid connecting with other drawings)
   context.arc(x, y, radius, 0, Math.PI * 2); // Draw the circle using arc method
-  context.fillStyle = "rgba(167, 2, 152, 1)";
+  context.fillStyle = color;
   context.fill(); // Fill the circle with the specified color
   context.closePath(); // Close the path
 }
@@ -133,8 +119,8 @@ function resetBall() {
   hit_counter = 0;
   computer_speed = 1.815;
   crazy_mode = false;
-  x_velocity = baseline_speed * (Math.random() > 0.5 ? 1 : -1);
-  y_velocity = baseline_speed * (Math.random() > 0.5 ? 1 : -1);
+  x_velocity = baseline_speed;
+  y_velocity = baseline_speed;
   console.log("Hit Counter reset to ", hit_counter);
 }
 // Bounce_ball()
@@ -197,7 +183,7 @@ function moveBall() {
   // incrementSpeed()
   incrementSpeed();
   // Re-draw the projectile
-  drawBall(ball_x, ball_y, ball_size / 2);
+  drawBall(ball_x, ball_y, ball_size / 2, "rgba(240, 247, 21)");
 }
 // Increment_speed of the x_velocity and computer_speed.
 function incrementSpeed() {
@@ -216,7 +202,7 @@ function incrementSpeed() {
   }
   if (hit_counter == 5 && power_up == 1) {
     x_velocity += x_velocity > 0 ? 1.2 : -1.2;
-    computer_speed += 0.0010;
+    computer_speed += 0.001;
     console.log(
       "Speed Incremented by: 1 and is now at: ",
       x_velocity,
@@ -293,7 +279,7 @@ function getRandomPosition(rectWidth, rectHeight) {
 // Spawns yellow rects from an array in a for loop with length of power_up_arr, starting with same rect as ball to begin with.
 function spawnPowerUps(power_up_arr) {
   if (!game_over) {
-    if (power_up === 5 && crazy_mode == false) {
+    if (power_up === 4 && crazy_mode == false) {
       power_up_arr.forEach((power_up, i) => {
         setTimeout(() => {
           const position = getRandomPosition(power_up.width, power_up.height);
@@ -310,8 +296,12 @@ function spawnPowerUps(power_up_arr) {
 function drawPowerUps(power_up_arr) {
   power_up_arr.forEach((power_up) => {
     if (power_up.isActive) {
-      context.fillStyle = "green";
-      drawBall(power_up.x, power_up.y, power_up.width / 2); // Draw power-up using ball size
+      drawBall(
+        power_up.x,
+        power_up.y,
+        power_up.width / 2,
+        "rgba(152, 229, 255)"
+      ); // Draw power-up using ball size
     }
   });
 }
@@ -334,10 +324,10 @@ function checkPowerUpCollision(power_up_arr) {
 // Computer_paddle()
 function computerPaddle() {
   // Decide the color
-  context.fillStyle = "rgba(235, 62, 62, 1)";
+  context.fillStyle = "rgba(152, 229, 255)";
   // Clear the previous rect for smooth movement
   context.clearRect(
-    game_plan.width - paddle_thickness,
+    game_plan.width - paddle_thickness - 5,
     computer_paddle_y,
     paddle_thickness,
     paddle_height
@@ -350,7 +340,7 @@ function computerPaddle() {
   }
   // Re-draw it after each If-check to make it look smooth.
   context.fillRect(
-    game_plan.width - paddle_thickness,
+    game_plan.width - paddle_thickness - 5,
     computer_paddle_y,
     paddle_thickness,
     paddle_height
@@ -360,63 +350,110 @@ function computerPaddle() {
 // Function to update the pos of player paddle.
 function playerPaddle() {
   // clear it before update:
-  context.clearRect(0, player_paddle_y, paddle_thickness, paddle_height);
+  context.clearRect(5, player_paddle_y, paddle_thickness, paddle_height);
   // Update the paddle position:
   player_paddle_y = Math.max(
     0,
     Math.min(game_plan.height - paddle_height, mouseY - paddle_height / 2)
   );
   // Re-Draw the paddle1_y
-  context.fillStyle = "rgba(70, 230, 88, 1)";
-  context.fillRect(0, player_paddle_y, paddle_thickness, paddle_height);
+  context.fillStyle = "rgba(255, 120, 121)";
+  context.fillRect(5, player_paddle_y, paddle_thickness, paddle_height);
 }
 
 // Rendering the game:
 function setupGamefield() {
-  // Set text color
+  // Add Score board boxes using drawball to make graphic round.
+  drawBall(
+    game_plan.width / 2 - 50,
+    game_plan.height - 675,
+    26,
+    "rgba(240, 247, 21)"
+  );
+  drawBall(
+    game_plan.width / 2 + 50,
+    game_plan.height - 675,
+    26,
+    "rgba(152, 229, 255)"
+  );
   context.fillStyle = "rgba(240, 247, 21)";
-  // Add Score board boxes
-  context.fillRect(90, game_plan.height - 95, 40, 40);
-  context.fillRect(game_plan.width - 110, 65, 40, 40);
-
   // Add the middle line
   context.fillRect(game_plan.width / 2, -1, 2, game_plan.height + 1);
 
   // Add the score text
-  context.font = "18px serif";
-  context.fillText("Your Score", 70, game_plan.height - 40);
-  context.fillText("AI Score", game_plan.width - 120, 60);
-  context.fillStyle = "gray";
+  context.font = "24px serif";
+  context.fillText("Du", 520, game_plan.height - 669);
+  context.fillStyle = "rgba(152, 229, 255)";
+  context.fillText("The Pong God", game_plan.width - 555, 52);
+
+  context.fillStyle = "black";
   context.font = "34px serif";
-  context.fillText(player1_score, 93, game_plan.height - 60);
-  context.fillText(computer_score, game_plan.width - 107, 100);
+  context.fillText(player1_score, 580, game_plan.height - 664);
+  context.fillText(computer_score, game_plan.width - 599, 57);
 }
 
 // End-Screen.
 function winnerScreen() {
   if (player1_score == winning_score || computer_score == winning_score) {
+    // Set game_over to be true to stop the gameloop.
     game_over = true;
-    context.fillStyle = "rgba(240, 247, 21)";
-    context.font = "48px serif";
-    context.fillText(
-      "End of Game",
-      game_plan.width / 2 - game_plan.width / 9,
-      game_plan.height / 2
-    );
+    // End screen text!
+    // Player wins:
     if (player1_score === winning_score) {
-      context.font = "24px serif";
+      context.font = "64px serif";
+      context.fillStyle = "rgba(240, 247, 21)";
       context.fillText(
-        `You won with a score of: ${player1_score},  computer: ${computer_score}`,
-        game_plan.width / 2 - game_plan.width / 6,
-        game_plan.height / 2 + 25
+        `Victory!!!!!`,
+        game_plan.width / 2 / 2,
+        game_plan.height / 2 - 240
+      );
+      context.fillText(
+        `Du krossade`,
+        game_plan.width / 2 / 2,
+        game_plan.height / 2 - 120
+      );
+      context.fillStyle = "rgba(152, 229, 255)";
+      context.fillText(
+        `The Pong God!`,
+        game_plan.width / 2 / 2,
+        game_plan.height / 2
+      );
+      context.fillStyle = "rgba(240, 247, 21)";
+      context.fillText(
+        `Du: ${player1_score}`,
+        game_plan.width / 2 / 2,
+        game_plan.height / 2 + 120
+      );
+      context.fillText(
+        `The Pong God: ${computer_score}`,
+        game_plan.width / 2 / 2,
+        game_plan.height / 2 + 240
       );
     }
+    // Computer wins:
     if (computer_score === winning_score) {
-      context.font = "24px serif";
+      context.font = "64px serif";
+      context.fillStyle = "rgba(240, 247, 21)";
       context.fillText(
-        `The AI won with a score of: ${computer_score},  you: ${player1_score}`,
-        game_plan.width / 2 - game_plan.width / 6,
-        game_plan.height / 2 + 25
+        `Världens minsta violin`,
+        game_plan.width / 2 / 2,
+        game_plan.height / 2 - 130
+      );
+      context.fillText(
+        `spelar en ledsen snutt`,
+        game_plan.width / 2 / 2,
+        game_plan.height / 2 - 50
+      );
+      context.fillText(
+        `Du: ${player1_score}`,
+        game_plan.width / 2 / 2,
+        game_plan.height / 2 + 50
+      );
+      context.fillStyle = "rgba(152, 229, 255)";
+      context.fillText(
+        `The Pong God: ${computer_score}`,
+        game_plan.width / 2 / 2,
+        game_plan.height / 2 + 130
       );
     }
     cancelAnimationFrame(animationid);
