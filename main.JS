@@ -60,15 +60,49 @@ let computer_score = 0;
 const winning_score = 2000;
 let game_over = false;
 
+// Set up background:
+function setBackground() {
+  const my_background = new Image();
+  my_background.src = "./Images/Pong.jpg";
+
+  my_background.onload = () => {
+    context.drawImage(my_background, 0, 0);
+  };
+}
+
 // Array of power_up Rects that will interact with the ball if hit
 const power_up_arr = [
-  { width: ball_size, height: ball_size },
-  { width: ball_size, height: ball_size },
-  { width: ball_size, height: ball_size },
-  { width: ball_size, height: ball_size },
-  { width: ball_size, height: ball_size },
+  { width: ball_size, height: ball_size, isActive: true },
+  { width: ball_size, height: ball_size, isActive: true },
+  { width: ball_size, height: ball_size, isActive: true },
+  { width: ball_size, height: ball_size, isActive: true },
+  { width: ball_size, height: ball_size, isActive: true },
 ];
 
+// Make the ball round:
+function drawBall(x, y, radius) {
+  context.beginPath(); // Start a new path (to avoid connecting with other drawings)
+  context.arc(x, y, radius, 0, Math.PI * 2); // Draw the circle using arc method
+  context.fillStyle = "rgba(240, 247, 21)";
+  context.fill(); // Fill the circle with the specified color
+  context.closePath(); // Close the path
+}
+// Clear a round area instead of square.
+function clearBall(x, y, radius) {
+  // Save the current context state
+  context.save();
+
+  // Create a circular clipping path
+  context.beginPath();
+  context.arc(x, y, radius, 0, Math.PI * 2);
+  context.clip();
+
+  // Clear the circular area
+  context.clearRect(x - radius, y - radius, radius * 2, radius * 2);
+
+  // Restore the original context state
+  context.restore();
+}
 // Reset_ball()
 function resetBall() {
   //Reset ball position after scoring:
@@ -137,23 +171,13 @@ function bounceBall() {
 // Move_ball()
 function moveBall() {
   // Clear previous projectile
-  context.clearRect(
-    ball_x - ball_size / 2 - Math.abs(x_velocity),
-    ball_y - ball_size / 2 - Math.abs(y_velocity),
-    ball_size + Math.abs(x_velocity) * 2,
-    ball_size + Math.abs(x_velocity) * 2
-  );
+  clearBall(ball_x, ball_y, ball_size / 2);
   // Call the bounceBall function with ball collision logic from here keeping it in one place.
   bounceBall();
   // incrementSpeed()
   incrementSpeed();
   // Re-draw the projectile
-  context.fillRect(
-    ball_x - ball_size / 2,
-    ball_y - ball_size / 2,
-    ball_size,
-    ball_size
-  );
+  drawBall(ball_x, ball_y, ball_size / 2);
 }
 // Increment_speed of the x_velocity and computer_speed.
 function incrementSpeed() {
@@ -255,41 +279,47 @@ function getRandomPosition(rectWidth, rectHeight) {
   return { x: randomX, y: randomY };
 }
 // Spawns yellow rects from an array in a for loop with length of power_up_arr, starting with same rect as ball to begin with.
-function drawPowerUpRect(power_up_arr) {
-  // draw rectangles function to apply to i with a delay of 5 seconds.
-  function drawRectangle(power_up_obj, position) {
-    console.log(
-      "Drawing rectangle at:",
-      position.x,
-      position.y,
-      "with dimensions:",
-      power_up_obj.width,
-      power_up_obj.height
-    );
-    // Draw the power_up , Now using the ball for size, can be changed later to whatever for different powers from the power_up_arr.
-    context.fillStyle = "green";
-    context.fillRect(
-      position.x,
-      position.y,
-      power_up_obj.width,
-      power_up_obj.height
-    );
-  }
+function spawnPowerUps(power_up_arr) {
   if (power_up == 5 && crazy_mode == false) {
-    // Loop over the power_up_arr at the top to produce spots
+    // Loop to add power-ups with a delay
     for (let i = 0; i < power_up_arr.length; i++) {
-      const position = getRandomPosition(
-        power_up_arr[i].width,
-        power_up_arr[i].height
-      );
       setTimeout(() => {
-        drawRectangle(power_up_arr[i], position);
-      }, i * 500); // 500ms delay or 5 seconds. This can be changed to set the interval between drawing the power_ups on the screen.
+        const position = getRandomPosition(
+          power_up_arr[i].width,
+          power_up_arr[i].height
+        );
+        power_up_arr[i].x = position.x;
+        power_up_arr[i].y = position.y;
+        console.log("Power-up spawned at:", position);
+      }, i * 2000); // 2 seconds delay between spawning each power-up
     }
     crazy_mode = true;
   }
 }
-
+function drawPowerUps() {
+  power_up_arr.forEach((power_up) => {
+    if (power_up.isActive) {
+      context.fillStyle = "green";
+      drawBall(power_up.x, power_up.y, power_up.width / 2); // Draw power-up using ball size
+    }
+  });
+}
+// Checking for powerUp Collision and changing velocity by delta * 0.3
+function checkPowerUpCollision() {
+  power_up_arr.forEach((power_up) => {
+    if (power_up.isActive) {
+      const distance = Math.sqrt(
+        (ball_x - power_up.x) ** 2 + (ball_y - power_up.y) ** 2
+      );
+      if (distance < ball_size / 2 + power_up.width / 2) {
+        // Handle power-up collision
+        power_up.isActive = false; // Deactivate power-up
+        x_velocity = -x_velocity; // Example: Change direction
+        console.log("Power-up collected at:", power_up.x, power_up.y);
+      }
+    }
+  });
+}
 // Computer_paddle()
 function computerPaddle() {
   // Decide the color
@@ -331,15 +361,6 @@ function playerPaddle() {
 
 // Rendering the game:
 function setupGamefield() {
-  // Background covers the power_up_rects for now. SOLVE!!
-  //Set canvas background:
-  // const my_background = new Image();
-  // my_background.src = "./Images/Pong.jpg";
-
-  // my_background.onload = () => {
-  //   context.drawImage(my_background, 0, 0);
-  // };
-
   // Set text color
   context.fillStyle = "rgba(240, 247, 21)";
   // Add Score board boxes
@@ -357,7 +378,7 @@ function setupGamefield() {
 }
 
 // End-Screen.
-function winnderScreen() {
+function winnerScreen() {
   if (player1_score == winning_score || computer_score == winning_score) {
     game_over = true;
     cancelAnimationFrame(animationid);
@@ -390,12 +411,15 @@ function winnderScreen() {
 // Setup the gameloop:
 function gameloop() {
   if (!game_over) {
+    setBackground();
     setupGamefield();
+    spawnPowerUps(power_up_arr);
+    drawPowerUps();
     computerPaddle();
     playerPaddle();
     moveBall();
-    drawPowerUpRect(power_up_arr);
-    winnderScreen();
+    checkPowerUpCollision();
+    winnerScreen();
 
     animationid = requestAnimationFrame(gameloop);
   }
