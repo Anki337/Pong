@@ -202,7 +202,7 @@ function moveBall() {
 // Increment_speed of the x_velocity and computer_speed.
 function incrementSpeed() {
   if (hit_counter == 2 && power_up == 0) {
-    x_velocity += x_velocity > 0 ? 1 : -1;
+    x_velocity += x_velocity > 0 ? 1.2 : -1.2;
     console.log(
       "Speed Incremented by: 1 and is now at: ",
       x_velocity,
@@ -215,8 +215,8 @@ function incrementSpeed() {
     power_up++;
   }
   if (hit_counter == 5 && power_up == 1) {
-    x_velocity += x_velocity > 0 ? 1 : -1;
-    computer_speed += 0.050;
+    x_velocity += x_velocity > 0 ? 1.2 : -1.2;
+    computer_speed += 0.0010;
     console.log(
       "Speed Incremented by: 1 and is now at: ",
       x_velocity,
@@ -229,7 +229,7 @@ function incrementSpeed() {
     power_up++;
   }
   if (hit_counter == 7 && power_up == 2) {
-    x_velocity += x_velocity > 0 ? 1 : -1;
+    x_velocity += x_velocity > 0 ? 1.2 : -1.2;
     console.log(
       "Speed Incremented by: 1 and is now at: ",
       x_velocity,
@@ -242,7 +242,8 @@ function incrementSpeed() {
     power_up++;
   }
   if (hit_counter == 9 && power_up == 3) {
-    x_velocity += x_velocity > 0 ? 1 : -1;
+    x_velocity += x_velocity > 0 ? 1.2 : -1.2;
+    computer_speed += 0.0025;
     console.log(
       "Speed Incremented by: 1 and is now at: ",
       x_velocity,
@@ -255,8 +256,8 @@ function incrementSpeed() {
     power_up++;
   }
   if (hit_counter == 11 && power_up == 4) {
-    x_velocity += x_velocity > 0 ? 1 : -1;
-    computer_speed += 0.5;
+    x_velocity += x_velocity > 0 ? 1.2 : -1.2;
+    computer_speed += 0.0025;
     console.log(
       "Speed Incremented by: 1 and is now at: ",
       x_velocity,
@@ -264,15 +265,12 @@ function incrementSpeed() {
       hit_counter,
       "consecutive hits!",
       "Power up is at level: ",
-      power_up,
-      "Computer speed power up by: ",
-      computer_speed
+      power_up
     );
     power_up++;
   }
   if (hit_counter == 20 && power_up == 5) {
     x_velocity += x_velocity > 0 ? 4 : -4;
-    computer_speed += computer_speed + 1;
     power_up++;
   }
 }
@@ -408,22 +406,23 @@ function winnerScreen() {
     if (player1_score === winning_score) {
       context.font = "24px serif";
       context.fillText(
-        "You won!",
-        game_plan.width / 2 - game_plan.width / 16,
+        `You won with a score of: ${player1_score},  computer: ${computer_score}`,
+        game_plan.width / 2 - game_plan.width / 6,
         game_plan.height / 2 + 25
       );
     }
     if (computer_score === winning_score) {
       context.font = "24px serif";
       context.fillText(
-        "The AI won!",
-        game_plan.width / 2 - game_plan.width / 16,
+        `The AI won with a score of: ${computer_score},  you: ${player1_score}`,
+        game_plan.width / 2 - game_plan.width / 6,
         game_plan.height / 2 + 25
       );
     }
     cancelAnimationFrame(animationid);
   }
 }
+
 // Setup the gameloop:
 function gameloop() {
   if (!game_over) {
